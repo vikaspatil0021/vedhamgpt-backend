@@ -116,10 +116,9 @@ router.post("/authorization-v", async (req, res) => {
 });
 
 
-router.get('/prompt.txt',(req,res)=>{
+router.get('/txt',(req,res)=>{
         var text =`[ { "name": "sunset", "value": 0.9900964498519897 }, { "name": "man", "value": 0.9701204299926758 }, { "name": "sun", "value": 0.967401921749115 }, { "name": "travel", "value": 0.965423583984375 }, { "name": "one", "value": 0.9653750061988831 }, { "name": "portrait", "value": 0.9652539491653442 }, { "name": "summer", "value": 0.9615834951400757 }, { "name": "outdoors", "value": 0.9578759074211121 }, { "name": "leisure", "value": 0.9568157196044922 }, { "name": "sky", "value": 0.9538112878799438 }, { "name": "sunglasses", "value": 0.9520582556724548 }, { "name": "fair weather", "value": 0.947190523147583 }, { "name": "landscape", "value": 0.9377776980400085 }, { "name": "beach", "value": 0.9292415380477905 }, { "name": "people", "value": 0.9278106689453125 }, { "name": "nature", "value": 0.9169023036956787 }, { "name": "recreation", "value": 0.9128032326698303 }, { "name": "water", "value": 0.8943551778793335 }, { "name": "grass", "value": 0.8860621452331543 }, { "name": "relaxation", "value": 0.8809468746185303 }] generate an short instagram caption based on only relevent name provided in the array`
         // res.attachment('./prompt.txt')
-        res.type('txt')
         res.send(text)
     
 })
