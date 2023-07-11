@@ -116,8 +116,12 @@ router.post("/authorization-v", async (req, res) => {
 });
 
 
-router.get('/',authenticateToken,(req,res)=>{
-    res.send('hi there cjkvksdvkjsdb')
+router.get('/prompt.txt',(req,res)=>{
+        var text = "Hello"
+        res.attachment('./prompt.txt')
+        res.type('txt')
+        res.send(text)
+    
 })
 
 
