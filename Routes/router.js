@@ -171,12 +171,12 @@ const predictImage = (inputs) => {
 
 
 // generate a caption from labels
-const openaiCaption = (caption) => {
+const openaiCaption = (caption, extraInfo) => {
     return new Promise((resolve, reject) => {
 
         openai.createCompletion({
             model: "text-davinci-003",
-            prompt: `" ${caption} " this string explains what is included in an image. create a short insta caption based on the string and also include 3 hashtags with 1 emoji and a bit of rhyming`,
+            prompt: `"${caption}" this string explains what is included in an image and ${extraInfo} and ignore the objects. create a short insta caption based on the string and also include 3 hashtags with 1 emoji and a bit of rhyming`,
             max_tokens: 300,
             temperature: 0.6,
         }).then((response) => {
@@ -194,7 +194,7 @@ const openaiCaption = (caption) => {
 
 router.post('/prompt', authenticateToken, async (req, res) => {
     try {
-        const { imageURL } = req.body;
+        const { imageURL, extraInfo } = req.body;
 
         const inputs = [
             {
@@ -207,7 +207,7 @@ router.post('/prompt', authenticateToken, async (req, res) => {
         ]
 
         const resultCaption = await predictImage(inputs);
-        const result = await openaiCaption(resultCaption);
+        const result = await openaiCaption(resultCaption, extraInfo);
 
         return res.send({
             result
