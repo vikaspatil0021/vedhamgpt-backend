@@ -151,7 +151,7 @@ const predictImage = (inputs) => {
             metadata,
             (err, response) => {
                 if (err) {
-                    reject(err);
+                    reject("Error:" + err);
                     return;
                 }
 
