@@ -176,7 +176,7 @@ const openaiCaption = (caption) => {
 
         openai.createCompletion({
             model: "text-davinci-003",
-            prompt: `" ${caption} " this string explains what is included in an image. create a short insta caption based on the string and also include 3 hashtags with 1 emoji`,
+            prompt: `" ${caption} " this string explains what is included in an image. create a short insta caption based on the string and also include 3 hashtags with 1 emoji and a bit of rhyming`,
             max_tokens: 300,
             temperature: 0.6,
         }).then((response) => {
