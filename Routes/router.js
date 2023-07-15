@@ -142,10 +142,10 @@ const predictImage = (inputs) => {
         stub.PostModelOutputs(
             {
                 user_app_id: {
-                    "user_id": "clarifai",
-                    "app_id": "main"
+                    "user_id": "salesforce",
+                    "app_id": "blip"
                 },
-                model_id: "general-image-recognition",
+                model_id: "general-english-image-caption-blip",
                 inputs: inputs
             },
             metadata,
@@ -160,19 +160,9 @@ const predictImage = (inputs) => {
                     return;
                 }
 
-                const output = response.outputs[0].data.concepts;
+                const output = response.outputs[0].data.text.raw;
 
-                const filteredOutput = output.filter(each => {
-                    if (each.value >= 0.8) {
-                        return each;
-                    }
-                })
-                const concepts = filteredOutput.map(each => {
-                    return each.name;
-
-                })
-
-                resolve(concepts)
+                resolve(output)
             }
         );
 
@@ -181,21 +171,21 @@ const predictImage = (inputs) => {
 
 
 // generate a caption from labels
-const openaiCaption = (labelArr) => {
+const openaiCaption = (caption) => {
     return new Promise((resolve, reject) => {
 
         openai.createCompletion({
             model: "text-davinci-003",
-            prompt: `${labelArr} generate an instagram caption based on labels and use hashtags not more than 3`,
+            prompt: `" ${caption} " this string explains what is included in an image. create a short insta caption based on the string and also include 3 hashtags with 1 emoji`,
             max_tokens: 300,
-            temperature: 0.3,
-         }).then((response)=>{
-           
-           resolve(response.data.choices[0].text);
-         }).catch(err=>{
-          reject(err)
-         })
-   })
+            temperature: 0.6,
+        }).then((response) => {
+
+            resolve(response.data.choices[0].text);
+        }).catch(err => {
+            reject(err)
+        })
+    })
 
 
 }
@@ -216,8 +206,8 @@ router.post('/prompt', authenticateToken, async (req, res) => {
             }
         ]
 
-        const resultLabels = await predictImage(inputs);
-        const result = await openaiCaption(resultLabels);
+        const resultCaption = await predictImage(inputs);
+        const result = await openaiCaption(resultCaption);
 
         return res.send({
             result
