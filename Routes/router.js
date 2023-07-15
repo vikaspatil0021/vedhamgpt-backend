@@ -186,9 +186,9 @@ const openaiCaption = (labelArr) => {
 
         openai.createCompletion({
             model: "text-davinci-003",
-            prompt: `${labelArr} generate an elegant and classic instagram caption based on labels and use hashtags not more than 3`,
+            prompt: `${labelArr} generate an instagram caption based on labels and use hashtags not more than 3`,
             max_tokens: 300,
-            temperature: 0.1,
+            temperature: 0.3,
          }).then((response)=>{
            
            resolve(response.data.choices[0].text);
