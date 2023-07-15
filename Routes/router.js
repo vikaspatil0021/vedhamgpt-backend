@@ -5,7 +5,7 @@ import nodemailer from 'nodemailer';
 import dotenv from "dotenv";
 dotenv.config();
 
-import { UserInfo } from "./../Modals/modal.js";
+import { CompletionInfo, UserInfo } from "./../Modals/modal.js";
 const otpStore = new Map();
 
 
@@ -209,9 +209,18 @@ router.post('/prompt', authenticateToken, async (req, res) => {
         const resultCaption = await predictImage(inputs);
         const result = await openaiCaption(resultCaption, extraInfo);
 
-        return res.send({
-            result
-        })
+        const data = await CompletionInfo.create({
+            date: new Date(),
+            data:{
+                imageURL,
+                inputText:extraInfo,
+                outputText:result
+            }
+        });
+        if(data){
+
+            return res.status(200).send({status:"OK"})
+        }
 
     } catch (error) {
         res.status(400).send({ Error: error.message })
