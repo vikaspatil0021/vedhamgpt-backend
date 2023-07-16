@@ -226,9 +226,9 @@ router.post('/prompt', authenticateToken, async (req, res) => {
         const d = new Date()
         const date = d.toISOString().split('T')[0];
 
-        const existingData = await CompletionInfo.findOne({ date });
         const user_id = req.user.user_id;
-
+        const existingData = await CompletionInfo.findOne({ user_id, date });
+        console.log(existingData)
         if (!existingData) {
 
             var data = await CompletionInfo.create({
@@ -244,7 +244,7 @@ router.post('/prompt', authenticateToken, async (req, res) => {
                 ]
             });
         } else {
-            data = await CompletionInfo.updateOne({ date }, {
+            data = await CompletionInfo.updateOne({ date, user_id }, {
                 data: [
                     ...existingData.data,
                     {
@@ -275,9 +275,13 @@ router.post('/prompt', authenticateToken, async (req, res) => {
 
 router.get("/completions", authenticateToken, async (req, res) => {
     const user_id = req.user.user_id;
+
+    const d = new Date()
+    const date = d.toISOString().split('T')[0];
     try {
 
-        const data_arr = await CompletionInfo.find({ user_id })
+
+        const data_arr = await CompletionInfo.find({ user_id, date })
         if (data_arr) res.status(200).json(data_arr);
 
     } catch (error) {
