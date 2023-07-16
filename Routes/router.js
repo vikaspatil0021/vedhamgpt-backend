@@ -46,7 +46,7 @@ const authenticateToken = (req, res, next) => {
     });
 }
 
-// Function to generate a 5-digit OTP
+// Function to generate a 4-digit OTP
 const generateOTP = () => {
     return Math.floor(1000 + Math.random() * 9000).toString();
 }
@@ -61,10 +61,10 @@ const sendOTP = async (email, otp, res) => {
     });
 
     var mailOptions = {
-        from: 'vikaspatil2103b@gmail.com',
+        from: 'vedhamGPT@gmail.com',
         to: email,
         subject: 'OTP for Vedham',
-        text: 'Welcome to Vedham. Your five digit OTP is ' + otp
+        text: 'Welcome to Vedham. \nYour FOUR digit OTP : ' + otp
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
@@ -131,12 +131,21 @@ router.post("/authorization-v", async (req, res) => {
     }
 });
 
+// checking the if the token has expired
+router.get("/check_token", authenticateToken, (req, res) => {
+    try {
+        res.status(200).json({ status: "OK" })
+    } catch (error) {
+        res.status(401).send({ Error: error })
+    }
+})
 
 
 
+
+// --------generation of caption-------
 
 // predict image concepts(labels)
-
 const predictImage = (inputs) => {
     try {
 
@@ -197,7 +206,6 @@ const openaiCaption = (caption, extraInfo) => {
 }
 
 // prompt 
-
 router.post('/prompt', authenticateToken, async (req, res) => {
     try {
         const { imageURL, extraInfo, Qno } = req.body;
@@ -217,7 +225,7 @@ router.post('/prompt', authenticateToken, async (req, res) => {
 
         const d = new Date()
         const date = d.toISOString().split('T')[0];
-        
+
         const existingData = await CompletionInfo.findOne({ date });
         const user_id = req.user.user_id;
 
@@ -235,9 +243,9 @@ router.post('/prompt', authenticateToken, async (req, res) => {
                     }
                 ]
             });
-        }else{
-            data = await CompletionInfo.updateOne({date},{
-                data:[
+        } else {
+            data = await CompletionInfo.updateOne({ date }, {
+                data: [
                     ...existingData.data,
                     {
                         Qno,
@@ -258,6 +266,25 @@ router.post('/prompt', authenticateToken, async (req, res) => {
         res.status(400).send({ Error: error })
     }
 })
+
+
+
+
+
+// ----------getting data from mongoDB------
+
+router.get("/completions", authenticateToken, async (req, res) => {
+    const user_id = req.user.user_id;
+    try {
+
+        const data_arr = await CompletionInfo.find({ user_id })
+        if (data_arr) res.status(200).json(data_arr);
+
+    } catch (error) {
+        res.status(400).send({ Error: error })
+    }
+})
+
 
 
 export default router;
