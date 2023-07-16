@@ -6,12 +6,9 @@ const userSchema = mongoose.Schema({
 });
 
 const completionSchema = mongoose.Schema({
+    user_id:String,
     date: String,
-    data:{
-        imageURL:String,
-        inputText:String,
-        outputText:String
-    }
+    data: []
 });
 
 const UserInfo = mongoose.model("user", userSchema);

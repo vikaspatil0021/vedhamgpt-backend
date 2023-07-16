@@ -138,35 +138,41 @@ router.post("/authorization-v", async (req, res) => {
 // predict image concepts(labels)
 
 const predictImage = (inputs) => {
-    return new Promise((resolve, reject) => {
-        stub.PostModelOutputs(
-            {
-                user_app_id: {
-                    "user_id": "salesforce",
-                    "app_id": "blip"
+    try {
+
+
+        return new Promise((resolve, reject) => {
+            stub.PostModelOutputs(
+                {
+                    user_app_id: {
+                        "user_id": "salesforce",
+                        "app_id": "blip"
+                    },
+                    model_id: "general-english-image-caption-blip",
+                    inputs: inputs
                 },
-                model_id: "general-english-image-caption-blip",
-                inputs: inputs
-            },
-            metadata,
-            (err, response) => {
-                if (err) {
-                    reject("Error:" + err);
-                    return;
+                metadata,
+                (err, response) => {
+                    if (err) {
+                        reject("Error:" + err);
+                        return;
+                    }
+
+                    if (response.status.code !== 10000) {
+                        reject("Received failed status: " + response.status.description + "\n" + response.status.details);
+                        return;
+                    }
+
+                    const output = response.outputs[0].data.text.raw;
+
+                    resolve(output)
                 }
+            );
 
-                if (response.status.code !== 10000) {
-                    reject("Received failed status: " + response.status.description + "\n" + response.status.details);
-                    return;
-                }
-
-                const output = response.outputs[0].data.text.raw;
-
-                resolve(output)
-            }
-        );
-
-    })
+        })
+    } catch (error) {
+        res.send({ Error: error.message })
+    }
 }
 
 
@@ -194,7 +200,7 @@ const openaiCaption = (caption, extraInfo) => {
 
 router.post('/prompt', authenticateToken, async (req, res) => {
     try {
-        const { imageURL, extraInfo } = req.body;
+        const { imageURL, extraInfo, Qno } = req.body;
 
         const inputs = [
             {
@@ -209,21 +215,47 @@ router.post('/prompt', authenticateToken, async (req, res) => {
         const resultCaption = await predictImage(inputs);
         const result = await openaiCaption(resultCaption, extraInfo);
 
-        const data = await CompletionInfo.create({
-            date: new Date(),
-            data:{
-                imageURL,
-                inputText:extraInfo,
-                outputText:result
-            }
-        });
-        if(data){
+        const d = new Date()
+        const date = d.toISOString().split('T')[0];
+        
+        const existingData = await CompletionInfo.findOne({ date });
+        const user_id = req.user.user_id;
 
-            return res.status(200).send({status:"OK"})
+        if (!existingData) {
+
+            var data = await CompletionInfo.create({
+                user_id,
+                date: date,
+                data: [
+                    {
+                        Qno,
+                        imageURL,
+                        inputText: extraInfo,
+                        outputText: result
+                    }
+                ]
+            });
+        }else{
+            data = await CompletionInfo.updateOne({date},{
+                data:[
+                    ...existingData.data,
+                    {
+                        Qno,
+                        imageURL,
+                        inputText: extraInfo,
+                        outputText: result
+                    }
+                ]
+            })
+        }
+
+        if (data) {
+
+            return res.status(200).send({ status: "OK" })
         }
 
     } catch (error) {
-        res.status(400).send({ Error: error.message })
+        res.status(400).send({ Error: error })
     }
 })
 
