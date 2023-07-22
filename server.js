@@ -27,10 +27,8 @@ mongoose.connect(process.env.MONGO_URL, {
         console.error('Error connecting to MongoDB Atlas:', err.message);
     });
 
-// app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
-// app.use(express.static("public"));
-app.use(cors());
+app.use(cors(corsOptions));
 
 
 
