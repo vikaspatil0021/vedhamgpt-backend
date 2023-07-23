@@ -290,5 +290,57 @@ router.get("/completions", authenticateToken, async (req, res) => {
 })
 
 
+router.get("/allDates", authenticateToken, async (req, res) => {
+    const user_id = req.user.user_id;
+
+    try {
+        const result = await CompletionInfo.aggregate([
+            {
+                $match: {
+                  user_id
+                }
+              },
+              {
+                $group: {
+                  _id: null,
+                  dates: { $addToSet: "$date" }
+                }
+              },
+              {
+                $project: {
+                  _id: 0,
+                  dates: 1
+                }
+              },
+              {
+                $unwind: "$dates"
+              },
+              {
+                $sort: {
+                  dates: -1
+                }
+              },
+              {
+                $group: {
+                  _id: null,
+                  dates: { $push: "$dates" }
+                }
+              },
+              {
+                $project: {
+                  _id: 0,
+                  dates: 1
+                }
+              }
+        ]);
+
+        res.status(200).json(result[0].dates);
+
+    } catch (error) {
+        res.status(400).send({ Error: error })
+    }
+
+})
+
 
 export default router;

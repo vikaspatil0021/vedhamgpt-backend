@@ -34,7 +34,7 @@ app.use(cors(corsOptions));
 
 
 
-app.use(router)
+app.use(router);
 app.listen(process.env.PORT || 5000, (req, res) => {
 
     console.log("Server has started on port 5000.");
