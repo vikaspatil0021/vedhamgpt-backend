@@ -273,13 +273,11 @@ router.post('/prompt', authenticateToken, async (req, res) => {
 
 // ----------getting data from mongoDB------
 
-router.get("/completions", authenticateToken, async (req, res) => {
+router.get("/completions/:date", authenticateToken, async (req, res) => {
     const user_id = req.user.user_id;
+    const date = req.params.date;
 
-    const d = new Date()
-    const date = d.toISOString().split('T')[0];
     try {
-
 
         const data_arr = await CompletionInfo.find({ user_id, date })
         if (data_arr) res.status(200).json(data_arr);
