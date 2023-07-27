@@ -263,15 +263,14 @@ router.post('/prompt', authenticateToken, async (req, res) => {
         }
 
     } catch (error) {
-        res.status(400).send({ Error: error })
+        res.status(400).send({ Error: error.message })
     }
 })
 
 
 
 
-
-// ----------getting data from mongoDB------
+// ----------getting data from mongoDB based on dates------
 
 router.get("/completions/:date", authenticateToken, async (req, res) => {
     const user_id = req.user.user_id;
@@ -282,12 +281,14 @@ router.get("/completions/:date", authenticateToken, async (req, res) => {
         const data_arr = await CompletionInfo.find({ user_id, date })
         if (data_arr) res.status(200).json(data_arr);
 
+
     } catch (error) {
-        res.status(400).send({ Error: error })
+        res.status(400).send({ Error: error.message })
     }
 })
 
 
+// --------- getting data from all dates
 router.get("/allDates", authenticateToken, async (req, res) => {
     const user_id = req.user.user_id;
 
@@ -335,7 +336,7 @@ router.get("/allDates", authenticateToken, async (req, res) => {
         res.status(200).json(result[0].dates);
 
     } catch (error) {
-        res.status(400).send({ Error: error })
+        res.status(400).send({ Error: error.message })
     }
 
 })
