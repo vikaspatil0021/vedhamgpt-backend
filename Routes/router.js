@@ -125,7 +125,14 @@ router.post("/authorization-v", async (req, res) => {
 
         const token = jwt.sign(jwtOptions, process.env.TOKEN_SECRET_KEY, { expiresIn: 60 * 60 * 24 });
 
-        res.status(200).json({ status: "ok", token: token });
+        res.status(200).json({
+            status: "ok",
+            token: token,
+            user: {
+                email: existingUser ? existingUser.email : user.email,
+                fName: existingUser ? existingUser.fName : user.fName
+            }
+        });
     } catch (error) {
         res.send({ Error: error.message })
     }
@@ -296,41 +303,41 @@ router.get("/allDates", authenticateToken, async (req, res) => {
         const result = await CompletionInfo.aggregate([
             {
                 $match: {
-                  user_id
+                    user_id
                 }
-              },
-              {
+            },
+            {
                 $group: {
-                  _id: null,
-                  dates: { $addToSet: "$date" }
+                    _id: null,
+                    dates: { $addToSet: "$date" }
                 }
-              },
-              {
+            },
+            {
                 $project: {
-                  _id: 0,
-                  dates: 1
+                    _id: 0,
+                    dates: 1
                 }
-              },
-              {
+            },
+            {
                 $unwind: "$dates"
-              },
-              {
+            },
+            {
                 $sort: {
-                  dates: -1
+                    dates: -1
                 }
-              },
-              {
+            },
+            {
                 $group: {
-                  _id: null,
-                  dates: { $push: "$dates" }
+                    _id: null,
+                    dates: { $push: "$dates" }
                 }
-              },
-              {
+            },
+            {
                 $project: {
-                  _id: 0,
-                  dates: 1
+                    _id: 0,
+                    dates: 1
                 }
-              }
+            }
         ]);
 
         res.status(200).json(result[0].dates);
