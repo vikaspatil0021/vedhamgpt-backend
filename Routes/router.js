@@ -198,7 +198,11 @@ const openaiCaption = (caption, extraInfo) => {
 
         openai.createCompletion({
             model: "text-davinci-003",
-            prompt: `"${caption}" this string explains what is included in an image and ${extraInfo} and ignore the objects. create a short insta caption based on the string and also include 3 hashtags with 1 emoji and a bit of rhyming`,
+            prompt: `create a short caption for instagram post based on the following commands:
+            1. This string provides a description of the contents present in an image = "${caption}"
+            2. Also the user has provided some information on the image = "${extraInfo}"
+            3. include one hashtag and one emoji and a bit of rhyming
+            4. caption should be of 2 lines in length`,
             max_tokens: 300,
             temperature: 0.6,
         }).then((response) => {
