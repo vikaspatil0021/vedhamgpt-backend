@@ -123,7 +123,7 @@ router.post("/authorization-v", async (req, res) => {
             }
         }
 
-        const token = jwt.sign(jwtOptions, process.env.TOKEN_SECRET_KEY, { expiresIn: 60 * 60 * 24 });
+        const token = jwt.sign(jwtOptions, process.env.TOKEN_SECRET_KEY, { expiresIn: 60 * 60 * 24 * 30 });
 
         res.status(200).json({
             status: "ok",
